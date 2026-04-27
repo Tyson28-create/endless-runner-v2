@@ -242,4 +242,3 @@ function render() {
 
 // Initial start
 resetGame();
-resetGame();
