@@ -8,7 +8,19 @@ const pauseBtn = document.getElementById("pauseBtn");
 const gameOverOverlay = document.getElementById("game-over-overlay");
 const finalScoreElement = document.getElementById("final-score");
 
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+}
+window.addEventListener('resize', resize);
+resize();
+
+
 if (!gl) alert("WebGL not supported");
+
+// Retrieve high score immediately on load
+let highScore = parseInt(localStorage.getItem("endlessRunnerBest")) || 0;
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -134,7 +146,7 @@ function resetGame() {
 
     gameOverOverlay.style.display = "none";
     pauseBtn.innerText = "Pause";
-    scoreElement.innerText = "Score: 0";
+    scoreElement.innerText = `Score: 0 | Best: ${highScore}`;
 
     requestAnimationFrame(render);
 }
@@ -145,6 +157,12 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft" || e.key === "a") player.lane = Math.max(0, player.lane - 1);
     if (e.key === "ArrowRight" || e.key === "d") player.lane = Math.min(2, player.lane + 1);
 });
+
+canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+    if (x < window.innerWidth / 2) moveLeft(); else moveRight();
+}, { passive: false });
 
 pauseBtn.addEventListener("click", togglePause);
 
@@ -190,33 +208,31 @@ function drawMesh(data, indices, mat, useTex, color = [1,1,1]) {
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
-function render() {
+        function render() {
     if (gameOver) {
+        // Save score if it's the new high score
+        const currentScore = Math.floor(score);
+        if (currentScore > highScore) {
+            highScore = currentScore;
+            localStorage.setItem("endlessRunnerBest", highScore);
+        }
+        
         gameOverOverlay.style.display = "block";
-        finalScoreElement.innerText = "Final Score: " + Math.floor(score);
+        finalScoreElement.innerText = "Final Score: " + currentScore;
+        bestScoreElement.innerText = "Best Score: " + highScore;
         return; 
     }
 
     if (!paused) {
-        // Smooth lane switching
-        player.x += (lanes[player.lane] - player.x) * 0.2;
-
-        // Move obstacles
+        player.x += (lanes[player.lane] - player.x) * 0.15;
         obstacles.forEach(o => {
             o.z += speed;
-            // Collision detection
-            if (Math.abs(player.x - o.x) < 0.8 && Math.abs(player.z - o.z) < 1.8) {
-                gameOver = true;
-            }
+            if (Math.abs(player.x - o.x) < 0.9 && Math.abs(player.z - o.z) < 1.5) gameOver = true;
         });
-
         obstacles = obstacles.filter(o => o.z < 10);
-
-        // SPEED RAMP: The game gets faster every second
-        speed += 0.00008; 
-        score += speed * 2; 
-
-        scoreElement.innerText = "Score: " + Math.floor(score) + (paused ? " (PAUSED)" : "");
+        speed += 0.0009; 
+        score += speed * 2;
+        scoreElement.innerText = `Score: ${Math.floor(score)} | Best: ${highScore}`;
     }
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
