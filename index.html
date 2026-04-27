@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endless Runner</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Top Left Score Display */
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Top Right Pause Button */
+        #pauseBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 25px;
+            font-size: 18px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        #pauseBtn:hover {
+            background: #d97706;
+        }
+
+        /* Game Over Center Overlay */
+        #game-over-overlay {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            z-index: 100;
+            min-width: 300px;
+        }
+
+        #game-over-overlay h1 {
+            font-size: 48px;
+            margin: 0 0 10px 0;
+            color: #ef4444;
+        }
+
+        #final-score {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        #restartBtn {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        #restartBtn:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="score">Score: 0</div>
+    
+    <button id="pauseBtn">Pause</button>
+
+    <div id="game-over-overlay">
+        <h1>GAME OVER</h1>
+        <p id="final-score">Final Score: 0</p>
+        <button id="restartBtn" onclick="resetGame()">PLAY AGAIN</button>
+    </div>
+
+    <canvas id="glcanvas"></canvas>
+
+    <script src="main.js"></script>
+
+</body>
+</html>
